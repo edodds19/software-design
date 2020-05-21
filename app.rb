@@ -20,3 +20,42 @@ get "/" do
   puts @events.inspect
   view "events"
 end
+
+get "/events/:id" do
+    # SELECT * FROM events WHERE id=:id
+    @event = events_table.where(:id => params["id"]).to_a[0]
+    # SELECT * FROM rsvps WHERE event_id=:id
+    @rsvps = rsvps_table.where(:event_id => params["id"]).to_a[0]
+    # SELECT * FROM rsvps WHERE event_id=:id
+    @count = rsvp_table.where(:event_id => params["id"], :going => true).count
+
+    puts @event.inspect
+    puts @rsvps.inspect
+    view "event"
+end
+
+get "/events/:id/rsvps/new" do
+    @event = events_table.where(:id => params["id"]).to_a[0]
+    puts @event.inspect
+    view "new_rsvp.erb"
+end
+
+get "/events/:id/rsvps/create" do
+    puts params.inspect
+    rsvps_table.insert(:event_id => params["id"], 
+                       :going => params["going"], 
+                       :name => params["name"], 
+                       :email => params ["emails"], 
+                       :comments => params ["comments"])
+    view "create_rsvp"
+end
+
+
+# get "/tacos" do
+#    puts params.inspect
+#    view "tacos"
+# end
+
+# get "/123/123/123/123" do
+#    view "tacos"
+# end
